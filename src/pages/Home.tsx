@@ -15,14 +15,6 @@ const CryptoTradeComponent = () => {
   const [timeLabels, setTimeLabels] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!socket.connected) {
-      socket.connect();
-    }
-
-    socket.on('connect', () => {
-      console.log('Connected to WebSocket');
-    });
-
     socket.on('trade', (data: any) => {
       setTradeData(data);
 
@@ -40,7 +32,7 @@ const CryptoTradeComponent = () => {
     return () => {
       socket.off('trade');
     };
-  }, []);
+  });
   
 
 
