@@ -2,19 +2,26 @@ import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
 import io from 'socket.io-client';
+import { config } from '../config';
 import './Home.css';
 
-const socket = io('https://oral-doti-eximia-d81f2754.koyeb.app/');
-
-// Register Chart.js components
+const socket = io(config.baseUrl);
 Chart.register(...registerables);
 
-const CryptoTradeComponent = () => {
+const Home = () => {
   const [tradeData, setTradeData] = useState<any>(null);
   const [dataPoints, setDataPoints] = useState<number[]>([]);
   const [timeLabels, setTimeLabels] = useState<string[]>([]);
 
   useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket');
+    });
+
     socket.on('trade', (data: any) => {
       setTradeData(data);
 
@@ -23,7 +30,7 @@ const CryptoTradeComponent = () => {
         minute: '2-digit',
         hour12: true,
       });
-      const price = parseFloat(data.p);
+      const price = parseFloat(data.currentPrice);
 
       setDataPoints((prevData) => [...prevData, price]);
       setTimeLabels((prevLabels) => [...prevLabels, time]);
@@ -32,9 +39,7 @@ const CryptoTradeComponent = () => {
     return () => {
       socket.off('trade');
     };
-  });
-  
-
+  }, []);
 
   const chartData = {
     labels: timeLabels,
@@ -54,8 +59,31 @@ const CryptoTradeComponent = () => {
       <h1 className="header">Live Trade Data</h1>
       {tradeData ? (
         <div className="trade-info">
-          <p>Symbol: {tradeData.s}</p>
-          <p>Price: ${tradeData.p}</p>
+          <p>
+            Symbol: <strong>{tradeData.s}</strong>
+          </p>
+          <p>
+            Price:{' '}
+            <span className="current-price">
+              ${tradeData.currentPrice.toFixed(2)}
+            </span>
+          </p>
+          <p
+            className={`compared ${
+              tradeData.trend === 'increase'
+                ? 'increase'
+                : tradeData.trend === 'decrease'
+                ? 'decrease'
+                : ''
+            }`}
+          >
+            {tradeData.trend === 'increase'
+              ? '↑'
+              : tradeData.trend === 'decrease'
+              ? '↓'
+              : ''}{' '}
+            ${tradeData.compared.toFixed(2)}
+          </p>
         </div>
       ) : (
         <p>No trade data received yet...</p>
@@ -67,4 +95,4 @@ const CryptoTradeComponent = () => {
   );
 };
 
-export default CryptoTradeComponent;
+export default Home;
