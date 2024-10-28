@@ -54,5 +54,7 @@ body {
 @media (max-width: 600px) {
   .chart-container {
     width: 90%; 
+    height: 250px; 
+
   }
 }

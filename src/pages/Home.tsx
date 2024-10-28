@@ -4,7 +4,7 @@ import { Chart, registerables } from 'chart.js';
 import io from 'socket.io-client';
 import './Home.css';
 
-const socket = io('ws://localhost:3200');
+const socket = io('https://oral-doti-eximia-d81f2754.koyeb.app/');
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -21,7 +21,7 @@ const CryptoTradeComponent = () => {
       const time = new Date(data.t).toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false,
+        hour12: true,
       });
       const price = parseFloat(data.p);
 
