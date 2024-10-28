@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
 import io from 'socket.io-client';
-import { config } from '../config';
+// import { config } from '../config';
 import './Home.css';
 
-const socket = io(config.baseUrl);
+const socket = io('https://oral-doti-eximia-d81f2754.koyeb.app/');
+
 Chart.register(...registerables);
 
 const Home = () => {
